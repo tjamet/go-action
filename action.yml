@@ -6,5 +6,19 @@ inputs:
     description: 'input description here'
     default: 'default value if applicable'
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: "composite"
+  steps:
+  - run: |
+      echo "${{ toJSON(github) }}"
+      echo "${{ github.action_repository }}"
+    shell: bash
+  - uses: actions-go/go-install@main
+    id: install
+    with:
+      # module: "github.com/actions-go/go-action@${{ github.action_ref != '' && github.action_ref || github.sha }}"
+      module: "github.com/actions-go/go-action@composite"
+  - run: |
+      ${{ steps.install.outputs.install-path }}
+      ls "${{ github.action_repository }}"
+      find "${{ github.action_repository }}"
+    shell: bash
